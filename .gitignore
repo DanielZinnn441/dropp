@@ -1,0 +1,6 @@
+# Git ignore for Dropship Viability System
+.DS_Store
+Thumbs.db
+*.log
+scratch/
+.system_generated/
