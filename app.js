@@ -297,7 +297,8 @@ function renderTable() {
       <td class="${fin.profitMarginPct >= 0 ? 'val-positive' : 'val-negative'}">${formatPct(fin.profitMarginPct)}</td>
       <td class="${fin.roiPct >= 0 ? 'val-positive' : 'val-negative'}">${formatPct(fin.roiPct)}</td>
       
-      <td>
+      <td style="white-space: nowrap;">
+        <button onclick="openEditModal('${item.id}')" class="btn btn-outline btn-sm" title="Editar Produto" style="margin-right:4px; color:var(--primary-blue); border-color: rgba(59,130,246,0.4);">✏️ Editar</button>
         <button onclick="deleteProduct('${item.id}')" class="btn btn-outline btn-sm" title="Excluir" style="color:var(--accent-red);">✕</button>
       </td>
     `;
@@ -333,8 +334,11 @@ function setupEventListeners() {
   const freightEl = document.getElementById('freightToggle');
   if (freightEl) freightEl.addEventListener('change', (e) => { isFreeFreightCoupon = e.target.checked; renderApp(); });
 
-  const formEl = document.getElementById('addProductForm');
-  if (formEl) formEl.addEventListener('submit', handleAddProduct);
+  const formAdd = document.getElementById('addProductForm');
+  if (formAdd) formAdd.addEventListener('submit', handleAddProduct);
+
+  const formEdit = document.getElementById('editProductForm');
+  if (formEdit) formEdit.addEventListener('submit', handleEditProduct);
 }
 
 function switchTab(tabName) {
@@ -401,6 +405,49 @@ function handleAddProduct(e) {
   saveData();
   closeModal('modal-add-product');
   document.getElementById('addProductForm').reset();
+  renderApp();
+}
+
+// EDIÇÃO DE PRODUTOS
+function openEditModal(id) {
+  const prod = products.find(p => p.id === id);
+  if (!prod) return;
+
+  document.getElementById('edit-inp-id').value = prod.id;
+  document.getElementById('edit-inp-name').value = prod.name || '';
+  document.getElementById('edit-inp-category').value = prod.category || 'Cozinha / Organização';
+  document.getElementById('edit-inp-amz-price').value = prod.amzPrice || 0;
+  document.getElementById('edit-inp-amz-link').value = prod.amzLink || '';
+  document.getElementById('edit-inp-price').value = prod.sourcePrice || 0;
+  document.getElementById('edit-inp-freight').value = prod.freightEst || 0;
+  document.getElementById('edit-inp-link').value = prod.shpLink || '';
+  document.getElementById('edit-inp-store').value = prod.shpStore || '';
+  document.getElementById('edit-inp-priority').value = prod.priority || 'Média';
+  document.getElementById('edit-inp-notes').value = prod.notes || '';
+
+  openModal('modal-edit-product');
+}
+
+function handleEditProduct(e) {
+  e.preventDefault();
+
+  const id = document.getElementById('edit-inp-id').value;
+  const prod = products.find(p => p.id === id);
+  if (!prod) return;
+
+  prod.name = document.getElementById('edit-inp-name').value;
+  prod.category = document.getElementById('edit-inp-category').value;
+  prod.amzPrice = parseFloat(document.getElementById('edit-inp-amz-price').value) || 0;
+  prod.amzLink = document.getElementById('edit-inp-amz-link').value;
+  prod.sourcePrice = parseFloat(document.getElementById('edit-inp-price').value) || 0;
+  prod.freightEst = parseFloat(document.getElementById('edit-inp-freight').value) || 0;
+  prod.shpLink = document.getElementById('edit-inp-link').value;
+  prod.shpStore = document.getElementById('edit-inp-store').value;
+  prod.priority = document.getElementById('edit-inp-priority').value;
+  prod.notes = document.getElementById('edit-inp-notes').value;
+
+  saveData();
+  closeModal('modal-edit-product');
   renderApp();
 }
 
